@@ -12,9 +12,9 @@ const AGENT_PROMPTS: Record<AgentType, string> = {
   quiz: `You are a quiz generator for AI/ML topics. Based on what the student has been learning in this conversation, generate a quiz question. You MUST respond in this EXACT JSON format and nothing else — no markdown, no backticks, no extra text:
 {"type":"quiz","question":"your question here","options":["option A","option B","option C","option D"],"correctIndex":0,"explanation":"why the answer is correct"}`,
 
-  diagram: `You are a visual learning assistant. When explaining AI/ML concepts, create a step-by-step visual diagram. You MUST respond in this EXACT JSON format and nothing else — no markdown, no backticks, no extra text:
-{"type":"diagram","title":"Title of the process","steps":[{"label":"Step name","description":"Brief explanation"},{"label":"Step 2","description":"Brief explanation"}]}
-Make sure to include 4-7 steps that clearly show the process or concept.`,
+  diagram: `You are a visual learning assistant for AI/ML topics. Create a step-by-step diagram. Respond with ONLY valid JSON, no other text. Use this exact structure:
+{"type":"diagram","title":"Your Title","steps":[{"label":"Step 1 Name","description":"What happens in step 1"},{"label":"Step 2 Name","description":"What happens in step 2"},{"label":"Step 3 Name","description":"What happens in step 3"},{"label":"Step 4 Name","description":"What happens in step 4"},{"label":"Step 5 Name","description":"What happens in step 5"}]}
+Important: "steps" must be a flat array of objects. Each object has "label" and "description" strings. Include 4-7 steps. No nested objects.`,
 };
 
 function detectAgent(
@@ -96,11 +96,16 @@ export async function POST(req: NextRequest) {
     }
 
     if (agent === "diagram") {
-      try {
-        const cleaned = reply.replace(/```json|```/g, "").trim();
-        parsedDiagram = JSON.parse(cleaned);
-      } catch {}
-    }
+        try {
+          const cleaned = reply.replace(/```json|```/g, "").trim();
+          const parsed = JSON.parse(cleaned);
+          if (parsed.steps && Array.isArray(parsed.steps)) {
+            parsedDiagram = parsed;
+          } else if (parsed.steps && parsed.steps.steps && Array.isArray(parsed.steps.steps)) {
+            parsedDiagram = { type: "diagram", title: parsed.title, steps: parsed.steps.steps };
+          }
+        } catch {}
+      }
 
     return NextResponse.json({
       reply: parsedQuiz || parsedDiagram ? "" : reply,
