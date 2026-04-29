@@ -52,8 +52,27 @@ cd ai-learning-app
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory:
-OPENROUTER_API_KEY=your-api-key-here
+3. **Set up OpenRouter API Key:**
+
+   a. Go to [openrouter.ai/keys](https://openrouter.ai/keys)
+   
+   b. Sign up or log in to your OpenRouter account
+   
+   c. Create a new API key and copy it
+   
+   d. Create a `.env.local` file in the root directory:
+   
+   ```bash
+   touch .env.local
+   ```
+   
+   e. Add your API key to `.env.local`:
+   
+   ```
+   OPENROUTER_API_KEY=your-api-key-here
+   ```
+   
+   > **Note:** The app uses the free-tier model `nousresearch/nous-hermes-2-mistral-7b-dpo:free` from OpenRouter. No credit card is required for free tier access.
 
 4. Run the development server:
 

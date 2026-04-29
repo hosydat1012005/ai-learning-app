@@ -3,6 +3,8 @@
 import ReactMarkdown from "react-markdown";
 import { useState } from "react";
 import Quiz from "./components/Quiz";
+import CodeRenderer from "./components/CodeRenderer";
+import ExplainerRenderer from "./components/ExplainerRenderer";
 
 type QuizData = {
   type: string;
@@ -174,6 +176,10 @@ export default function Home() {
                 title={msg.diagram.title}
                 steps={msg.diagram.steps}
               />
+            ) : msg.agent === "coder" ? (
+              <CodeRenderer content={msg.content || ""} />
+            ) : msg.agent === "explainer" ? (
+              <ExplainerRenderer content={msg.content || ""} />
             ) : (
               <div className="prose prose-invert prose-sm max-w-none">
                 <ReactMarkdown>{msg.content || "Sorry, I could not generate a response."}</ReactMarkdown>
